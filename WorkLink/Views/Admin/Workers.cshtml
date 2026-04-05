@@ -1,0 +1,54 @@
+﻿@using WorkLink.Models
+@{
+    ViewData["Title"] = "Worker Management";
+    var workers = Model as List<WorkerProfile>;
+}
+
+<h2 class="fw-bold mb-4">🛠 Worker Management</h2>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Profession</th>
+                    <th>City</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var w in workers)
+                {
+                    <tr>
+                        <td class="fw-semibold">@w.FullName</td>
+                        <td>@w.Profession</td>
+                        <td>@w.City</td>
+                        <td class="text-muted">@w.User?.Email</td>
+                        <td>
+                            @if (w.IsVerified)
+                            {
+                                <span class="badge bg-success">Verified</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (!w.IsVerified)
+                            {
+                                <form asp-action="VerifyWorker" method="post">
+                                    <input type="hidden" name="id" value="@w.WorkerProfileId" />
+                                    <button class="btn btn-sm btn-success">Verify</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

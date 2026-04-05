@@ -1,0 +1,113 @@
+﻿@model WorkLink.Models.WorkerProfile
+
+@{
+    ViewData["Title"] = "Hire Worker";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow">
+                <div class="card-body">
+
+                    <h4 class="fw-bold mb-2">Hire @Model.FullName</h4>
+                    <p class="text-muted">
+                        @Model.Profession • ₹@Model.HourlyRate / hr
+                    </p>
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="workerProfileId"
+                               value="@Model.WorkerProfileId" />
+
+                        <!-- ADDED: Employer Location -->
+                        <input type="hidden" name="employerLatitude" id="EmployerLatitude" />
+                        <input type="hidden" name="employerLongitude" id="EmployerLongitude" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Job Date</label>
+                            <input type="date"
+                                   name="jobDate"
+                                   class="form-control"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Hours</label>
+                            <input type="number"
+                                   name="hours"
+                                   min="1"
+                                   class="form-control"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Distance (Km)</label>
+                            <input type="number"
+                                   step="0.1"
+                                   name="distanceKm"
+                                   id="DistanceKm"
+                                   class="form-control"
+                                   readonly
+                                   required />
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Confirm Hire
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ADDED: Get Employer GPS Location -->
+<script>
+    navigator.geolocation.getCurrentPosition(function(position) {
+
+        const employerLat = position.coords.latitude;
+        const employerLng = position.coords.longitude;
+
+        document.getElementById("EmployerLatitude").value = employerLat;
+        document.getElementById("EmployerLongitude").value = employerLng;
+
+        const workerLat = @Model.Latitude;
+        const workerLng = @Model.Longitude;
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+
+            const dLat = (lat2-lat1) * Math.PI / 180;
+            const dLon = (lon2-lon1) * Math.PI / 180;
+
+            const a =
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI/180) *
+                Math.cos(lat2 * Math.PI/180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            return R * c;
+        }
+
+        const distance = calculateDistance(
+            employerLat,
+            employerLng,
+            workerLat,
+            workerLng
+        );
+
+        document.getElementById("DistanceKm").value = distance.toFixed(2);
+
+    });
+</script>

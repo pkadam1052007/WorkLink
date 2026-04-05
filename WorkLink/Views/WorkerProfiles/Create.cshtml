@@ -1,0 +1,100 @@
+﻿@model WorkLink.Models.WorkerProfile
+@{
+    ViewData["Title"] = "Create Worker Profile";
+}
+
+<h2 class="mb-4">Create Your Worker Profile</h2>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Full Name</label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">City</label>
+        <input asp-for="City" class="form-control" />
+        <span asp-validation-for="City" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Profession</label>
+        <input asp-for="Profession" class="form-control" />
+        <span asp-validation-for="Profession" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Experience</label>
+        <input asp-for="Experience" class="form-control" />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Phone Number</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Address</label>
+        <input asp-for="Address" class="form-control" />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Hourly Rate ($)</label>
+        <input asp-for="HourlyRate" class="form-control" type="number" step="0.01" />
+        <span asp-validation-for="HourlyRate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Rate per Km ($)</label>
+        <input asp-for="RatePerKm" class="form-control" type="number" step="0.01" />
+        <span asp-validation-for="RatePerKm" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Upload Profile Image</label>
+        <input asp-for="ProfileImageFile" type="file" class="form-control" />
+        <small class="text-muted">Optional. Recommended size: 250x250px</small>
+    </div>
+
+    <!-- ADDED: Worker GPS Location -->
+    <input asp-for="Latitude" type="hidden" id="WorkerLatitude" />
+    <input asp-for="Longitude" type="hidden" id="WorkerLongitude" />
+
+    <div class="col-12 mt-2">
+        <button type="submit" class="btn btn-success">Create Profile</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let locationReady = false;
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+
+            document.getElementById("WorkerLatitude").value = position.coords.latitude;
+            document.getElementById("WorkerLongitude").value = position.coords.longitude;
+
+            locationReady = true;
+
+        }, function(error) {
+            alert("Please allow location access to continue.");
+        });
+
+        document.querySelector("form").addEventListener("submit", function(e) {
+
+            if (!locationReady) {
+                e.preventDefault();
+                alert("Waiting for GPS location... Please try again.");
+            }
+
+        });
+    </script>
+}

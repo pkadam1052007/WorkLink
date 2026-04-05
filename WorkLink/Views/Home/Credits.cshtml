@@ -1,0 +1,182 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Credits";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Credits</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #050505, #000000 70%);
+            color: #eaeaea;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .credits {
+            position: absolute;
+            bottom: -120%;
+            width: 100%;
+            text-align: center;
+            animation: scrollCredits 40s linear forwards;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00ffff, 0 0 30px #00ffff, 0 0 60px #00ffff;
+            animation: glowPulse 2.5s infinite alternate;
+        }
+
+        h2 {
+            margin: 50px 0 20px;
+            font-size: 2rem;
+            color: #ff004c;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #ff004c, 0 0 30px #ff004c;
+        }
+
+        p {
+            margin: 10px 0;
+            font-size: 1.35rem;
+            opacity: 0;
+            animation: fadeInText 2s ease forwards;
+            text-shadow: 0 0 6px rgba(255,255,255,0.2);
+        }
+
+        /* Sequential fade */
+        .credits p:nth-of-type(1) {
+            animation-delay: 1s;
+        }
+
+        .credits p:nth-of-type(2) {
+            animation-delay: 2s;
+        }
+
+        .credits p:nth-of-type(3) {
+            animation-delay: 3s;
+        }
+
+        .credits p:nth-of-type(4) {
+            animation-delay: 4s;
+        }
+
+        .credits p:nth-of-type(5) {
+            animation-delay: 5s;
+        }
+
+        .credits p:nth-of-type(6) {
+            animation-delay: 6s;
+        }
+
+        .credits p:nth-of-type(7) {
+            animation-delay: 7s;
+        }
+
+        .credits p:nth-of-type(8) {
+            animation-delay: 8s;
+        }
+
+        .credits p:nth-of-type(9) {
+            animation-delay: 9s;
+        }
+
+        .credits p:nth-of-type(10) {
+            animation-delay: 10s;
+        }
+
+        /* Scroll */
+        @@keyframes scrollCredits {
+            from {
+                bottom: -120%;
+            }
+
+            to {
+                bottom: 120%;
+            }
+        }
+
+        /* Glow pulse */
+        @@keyframes glowPulse {
+            0% {
+                text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+            }
+
+            100% {
+                text-shadow: 0 0 20px #00ffff, 0 0 60px #00ffff, 0 0 100px #00ffff;
+            }
+        }
+
+        /* Fade in */
+        @@keyframes fadeInText {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* THE END */
+        .the-end {
+            font-size: 3.5rem;
+            margin-top: 80px;
+            color: #ffffff;
+            letter-spacing: 6px;
+            animation: endImpact 3s ease-in-out infinite alternate;
+            text-shadow: 0 0 20px #ffffff, 0 0 60px #00ffff, 0 0 120px #00ffff;
+        }
+
+        @@keyframes endImpact {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="credits">
+        <h1>WorkLink</h1>
+        <p>A Project Built With Dedication</p>
+
+        <h2>Core Development</h2>
+        <p>Prabhav Kadam</p>
+
+        <h2>Honourary Contributors</h2>
+        <p>Ismail Parker</p>
+        <p>Purvesh Patil</p>
+
+        <h2>Special Thanks</h2>
+        <p>ChatGPT</p>
+        <p>Depression</p>
+        <p>Trauma 🧠💀</p>
+        <p>Coffee ☕</p>
+        <p>Deadline Pressure</p>
+
+        <div class="the-end">THE END</div>
+    </div>
+
+</body>
+</html>

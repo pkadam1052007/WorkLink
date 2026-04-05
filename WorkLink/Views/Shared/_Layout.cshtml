@@ -1,0 +1,192 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using WorkLink.Models
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WorkLink</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+
+    <style>
+        /* Flex layout to keep footer at bottom */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1; /* takes remaining space so footer stays at bottom */
+        }
+
+        footer {
+            background: #222;
+            color: #fff;
+            text-align: center;
+            padding: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    @{
+        string displayName = User.Identity != null && User.Identity.IsAuthenticated
+        ? (UserManager.GetUserAsync(User).Result?.FullName ?? User.Identity.Name!)
+        : "";
+    }
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+            <div class="container-fluid">
+                <!-- LOGO + BRAND -->
+                <a class="navbar-brand d-flex align-items-center gap-2" href="#" id="logoEasterEgg">
+                    <img src="~/images/WorkLink.png" alt="WorkLink Logo" height="42" class="rounded" />
+                    <span class="fw-bold">WorkLink</span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- LEFT MENU -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    </ul>
+
+                    <!-- RIGHT MENU -->
+                    <ul class="navbar-nav ms-auto">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#profileMenu">
+                                    <i class="bi bi-person-circle"></i> @displayName
+                                </button>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main content -->
+    <main class="container my-5">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        &copy; @DateTime.Now.Year - WorkLink
+    </footer>
+
+    <!-- OFFCANVAS PROFILE MENU -->
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="profileMenu">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title">Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+
+            <div class="offcanvas-body">
+                <div class="mb-3">
+                    <strong>@displayName</strong><br />
+                    <small class="text-muted">Account</small>
+                </div>
+
+                <hr />
+
+                <a class="d-block mb-2 text-decoration-none" asp-area="Identity" asp-page="/Account/Manage/Index">👤 Profile</a>
+                <a class="d-block mb-2 text-decoration-none" asp-controller="Jobs" asp-action="MyBookings">📋 My Bookings</a>
+
+                <hr />
+
+                @if (User.IsInRole("Worker"))
+                {
+                    <a class="d-block mb-2 text-decoration-none" asp-controller="WorkerProfiles" asp-action="Dashboard">🛠 Worker Dashboard</a>
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a class="d-block mb-2 fw-bold text-decoration-none" asp-controller="Admin" asp-action="Index">🧠 Admin Control Panel</a>
+                }
+
+                <hr />
+
+                <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+                    <button type="submit" class="btn btn-danger w-100">Logout</button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <!-- LOGO EASTER EGG -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let clickCount = 0;
+            let triggerCount = 0; // tracks how many times 7-click sequence was done
+            const logo = document.getElementById("logoEasterEgg");
+
+            if (!logo) return;
+
+            logo.addEventListener("click", function (e) {
+                e.preventDefault();
+                clickCount++;
+
+                if (clickCount === 7) {
+                    triggerCount++;
+
+                    const div = document.createElement("div");
+                    div.style.cssText =
+                        "position:fixed; top:10%; left:50%; transform:translateX(-50%);" +
+                        "background:#222; color:#fff; padding:10px 15px; border-radius:8px;" +
+                        "z-index:10000; font-weight:bold; font-size:1rem; text-align:center;";
+
+                    if (triggerCount === 1) {
+                        div.textContent = "👑 Hey! This website was made by Prabhav Kadam";
+                        document.body.appendChild(div);
+                        setTimeout(() => div.remove(), 2000);
+                    } else if (triggerCount === 2) {
+                        div.textContent = "🎬 Starting the secret credits...";
+                        document.body.appendChild(div);
+                        setTimeout(() => {
+                            div.remove();
+                            window.location.href = "/Home/Credits";
+                        }, 2000);
+                    }
+
+                    clickCount = 0; // reset for next sequence
+                }
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

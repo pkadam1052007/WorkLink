@@ -1,0 +1,370 @@
+﻿@model WorkLink.Models.WorkerProfile
+
+@{
+    ViewData["Title"] = "Worker Dashboard";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<style>
+
+    body {
+        background: #f5f7fb;
+    }
+
+    .profile-card {
+        border: none;
+        border-radius: 14px;
+    }
+
+    .profile-img {
+        height: 220px;
+        object-fit: cover;
+    }
+
+    .job-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+        .job-card p {
+            margin-bottom: 5px;
+        }
+
+    .status-badge {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+
+    .job-actions button {
+        width: 100%;
+    }
+
+    /* Hide table on mobile */
+    @@media (max-width:768px) {
+
+        .desktop-table {
+            display: none;
+        }
+    }
+
+    /* Hide cards on desktop */
+    @@media (min-width:769px) {
+
+        .mobile-jobs {
+            display: none;
+        }
+    }
+
+</style>
+
+<div class="container py-4">
+
+    <div class="row g-4">
+
+        <!-- PROFILE -->
+
+        <div class="col-12 col-md-4">
+
+            <div class="card shadow-sm profile-card">
+
+                <img src="@(!string.IsNullOrEmpty(Model.ProfileImageUrl)
+                     ? Model.ProfileImageUrl
+                     : "https://via.placeholder.com/400x250")"
+                     class="card-img-top profile-img"
+                     alt="@Model.FullName" />
+
+                <div class="card-body text-center">
+
+                    <h4>@Model.FullName</h4>
+
+                    <p class="text-muted">@Model.Profession</p>
+
+                    <p><strong>City:</strong> @Model.City</p>
+
+                    <p><strong>Rate:</strong> ₹@Model.HourlyRate / hr</p>
+
+                    <a asp-action="Edit" class="btn btn-warning w-100 mt-2">
+                        Edit Profile
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- JOBS -->
+
+        <div class="col-12 col-md-8">
+
+            <h3 class="mb-3 text-center text-md-start">Your Jobs</h3>
+
+            <!-- DESKTOP TABLE -->
+
+            <div class="table-responsive desktop-table">
+
+                <table class="table table-bordered align-middle table-hover">
+
+                    <thead class="table-dark text-nowrap">
+                        <tr>
+                            <th>Customer</th>
+                            <th>Address</th>
+                            <th>Date</th>
+                            <th>Hours</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th class="text-md-end">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var job in Model.Jobs.OrderByDescending(j => j.JobDate))
+                        {
+
+                            <tr>
+
+                                <td>
+                                    <strong>@job.User.FullName</strong><br />
+                                    <small>@job.User.Email</small>
+                                </td>
+
+                                <td>@job.User.Address</td>
+
+                                <td>@job.JobDate.ToString("dd MMM yyyy")</td>
+
+                                <td>@job.Hours</td>
+
+                                <td class="text-success fw-semibold">
+                                    ₹@job.TotalAmount
+                                </td>
+
+                                <td>
+
+                                    @if (job.Status == JobStatus.Requested)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Requested
+                                        </span>
+                                    }
+
+                                    @if (job.Status == JobStatus.Accepted)
+                                    {
+                                        <span class="badge bg-info text-dark">
+                                            Accepted
+                                        </span>
+                                    }
+
+                                    @if (job.Status == JobStatus.Completed)
+                                    {
+                                        <span class="badge bg-success">
+                                            Completed
+                                        </span>
+                                    }
+
+                                    @if (job.Status == JobStatus.Cancelled)
+                                    {
+                                        <span class="badge bg-danger">
+                                            Cancelled
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td class="text-md-end">
+
+                                    <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+
+                                        @if (job.Status == JobStatus.Requested)
+                                        {
+
+                                            <form asp-controller="WorkerProfiles"
+                                                  asp-action="AcceptJob"
+                                                  method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden" name="jobId" value="@job.JobId" />
+
+                                                <button class="btn btn-sm btn-success w-100">
+                                                    Accept
+                                                </button>
+
+                                            </form>
+
+                                            <form asp-controller="Jobs"
+                                                  asp-action="CancelByWorker"
+                                                  asp-route-id="@job.JobId"
+                                                  method="post"
+                                                  onsubmit="return confirm('Cancel this job?');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button class="btn btn-sm btn-outline-danger w-100">
+                                                    Cancel
+                                                </button>
+
+                                            </form>
+
+                                        }
+
+                                        else if (job.Status == JobStatus.Accepted)
+                                        {
+
+                                            <form asp-controller="WorkerProfiles"
+                                                  asp-action="CompleteJob"
+                                                  method="post"
+                                                  onsubmit="return confirm('Mark job as completed?');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden" name="jobId" value="@job.JobId" />
+
+                                                <button class="btn btn-sm btn-primary w-100">
+                                                    Complete Job
+                                                </button>
+
+                                            </form>
+
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- MOBILE JOB CARDS -->
+
+            <div class="mobile-jobs">
+
+                @foreach (var job in Model.Jobs.OrderByDescending(j => j.JobDate))
+                {
+
+                    <div class="job-card mb-3">
+
+                        <h6 class="fw-bold">@job.User.FullName</h6>
+
+                        <p class="text-muted small">@job.User.Email</p>
+
+                        <p><strong>📍 Address:</strong> @job.User.Address</p>
+
+                        <p><strong>📅 Date:</strong> @job.JobDate.ToString("dd MMM yyyy")</p>
+
+                        <p><strong>⏱ Hours:</strong> @job.Hours</p>
+
+                        <p class="fw-bold text-success">
+                            ₹@job.TotalAmount
+                        </p>
+
+                        <div class="mb-2">
+
+                            @if (job.Status == JobStatus.Requested)
+                            {
+                                <span class="badge bg-warning text-dark status-badge">
+                                    Requested
+                                </span>
+                            }
+
+                            @if (job.Status == JobStatus.Accepted)
+                            {
+                                <span class="badge bg-info text-dark status-badge">
+                                    Accepted
+                                </span>
+                            }
+
+                            @if (job.Status == JobStatus.Completed)
+                            {
+                                <span class="badge bg-success status-badge">
+                                    Completed
+                                </span>
+                            }
+
+                            @if (job.Status == JobStatus.Cancelled)
+                            {
+                                <span class="badge bg-danger status-badge">
+                                    Cancelled
+                                </span>
+                            }
+
+                        </div>
+
+                        <div class="job-actions d-grid gap-2">
+
+                            @if (job.Status == JobStatus.Requested)
+                            {
+
+                                <form asp-controller="WorkerProfiles"
+                                      asp-action="AcceptJob"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden" name="jobId" value="@job.JobId" />
+
+                                    <button class="btn btn-success btn-sm">
+                                        Accept Job
+                                    </button>
+
+                                </form>
+
+                                <form asp-controller="Jobs"
+                                      asp-action="CancelByWorker"
+                                      asp-route-id="@job.JobId"
+                                      method="post"
+                                      onsubmit="return confirm('Cancel this job?');">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button class="btn btn-outline-danger btn-sm">
+                                        Cancel
+                                    </button>
+
+                                </form>
+
+                            }
+
+                            else if (job.Status == JobStatus.Accepted)
+                            {
+
+                                <form asp-controller="WorkerProfiles"
+                                      asp-action="CompleteJob"
+                                      method="post"
+                                      onsubmit="return confirm('Mark job as completed?');">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden" name="jobId" value="@job.JobId" />
+
+                                    <button class="btn btn-primary btn-sm">
+                                        Complete Job
+                                    </button>
+
+                                </form>
+
+                            }
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

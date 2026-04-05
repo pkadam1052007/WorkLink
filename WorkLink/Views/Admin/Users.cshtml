@@ -1,0 +1,52 @@
+﻿@using WorkLink.Models
+@model List<ApplicationUser>
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<h2 class="fw-bold mb-4">👥 User Management</h2>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    var isLocked = u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.UtcNow;
+
+                    <tr>
+                        <td class="fw-semibold">@u.FullName</td>
+                        <td class="text-muted">@u.Email</td>
+                        <td>
+                            @if (isLocked)
+                            {
+                                <span class="badge bg-danger">Locked</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form asp-action="ToggleUserLock" method="post">
+                                <input type="hidden" name="id" value="@u.Id" />
+                                <button class="btn btn-sm @(isLocked ? "btn-success" : "btn-danger")">
+                                    @(isLocked ? "Unlock" : "Lock")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,307 @@
+﻿@using WorkLink.Models
+@{
+    ViewData["Title"] = "Master Admin Dashboard";
+
+    var pendingWorkers = ViewBag.PendingVerifications as List<WorkerProfile>;
+    var users = ViewBag.AllUsers as List<ApplicationUser>;
+    var allWorkers = ViewBag.AllWorkers as List<WorkerProfile>;
+}
+
+<style>
+    /* ---- STAT CARDS ---- */
+    .stat-card {
+        border-radius: 18px;
+        border: none;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5rem;
+            opacity: 0.2;
+            position: absolute;
+            right: 16px;
+            bottom: 10px;
+        }
+
+        .stat-card h6 {
+            opacity: 0.85;
+            font-weight: 600;
+        }
+
+        .stat-card h2 {
+            font-weight: 800;
+            margin: 0;
+        }
+
+    .bg-users {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+    }
+
+    .bg-workers {
+        background: linear-gradient(135deg, #1cc88a, #13855c);
+    }
+
+    .bg-verified {
+        background: linear-gradient(135deg, #36b9cc, #258391);
+    }
+
+    .bg-revenue {
+        background: linear-gradient(135deg, #f6c23e, #dda20a);
+    }
+
+    /* ---- GENERAL ---- */
+    .section-title {
+        font-weight: 800;
+        letter-spacing: 0.3px;
+    }
+
+    .verify-btn, .lock-btn {
+        border-radius: 20px;
+        padding: 4px 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .tabs {
+        margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        cursor: pointer;
+        padding: 8px 20px;
+        border-radius: 30px;
+        margin-right: 8px;
+        border: none;
+        font-weight: 600;
+    }
+
+        .tab-btn.active {
+            background: #6f6af8;
+            color: #fff;
+        }
+</style>
+
+<h2 class="section-title mb-3">👑 Master Admin Dashboard</h2>
+<p class="text-muted mb-4">Manage system, users, and workers</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success rounded-3 shadow-sm mb-4">@TempData["Success"]</div>
+}
+
+<!-- TABS -->
+<div class="tabs mb-4">
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="users">Users</button>
+    <button class="tab-btn" data-tab="workers">Workers</button>
+</div>
+
+<!-- DASHBOARD TAB -->
+<div id="dashboard" class="tab-content">
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card stat-card bg-users shadow">
+                <div class="card-body">
+                    <h6>Users</h6>
+                    <h2>@ViewBag.TotalUsers</h2>
+                    <div class="icon">👥</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-workers shadow">
+                <div class="card-body">
+                    <h6>Workers</h6>
+                    <h2>@ViewBag.TotalWorkers</h2>
+                    <div class="icon">🛠</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-verified shadow">
+                <div class="card-body">
+                    <h6>Verified Workers</h6>
+                    <h2>@ViewBag.VerifiedWorkers</h2>
+                    <div class="icon">✅</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-revenue shadow">
+                <div class="card-body">
+                    <h6>Total Revenue</h6>
+                    <h2>₹@ViewBag.TotalRevenue</h2>
+                    <div class="icon">💰</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PENDING VERIFICATIONS -->
+    <h4 class="section-title mb-3">⏳ Pending Worker Verifications</h4>
+    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3">
+        @(pendingWorkers?.Count ?? 0) Pending
+    </span>
+
+    @if (pendingWorkers == null || !pendingWorkers.Any())
+    {
+        <div class="alert alert-light border rounded-3 text-center">🎉 All workers are verified</div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Profession</th>
+                            <th>City</th>
+                            <th>Email</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var w in pendingWorkers)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@w.FullName</td>
+                                <td>@w.Profession</td>
+                                <td>@w.City</td>
+                                <td class="text-muted">@w.User?.Email</td>
+                                <td class="text-end">
+                                    <form asp-action="VerifyWorker" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@w.WorkerProfileId" />
+                                        <button class="btn btn-success verify-btn">Verify</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- USERS TAB -->
+<div id="users" class="tab-content" style="display:none">
+    <h4 class="section-title mb-3">👥 Users Management</h4>
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in users)
+                    {
+                        var isLocked = u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.UtcNow;
+                        <tr>
+                            <td class="fw-semibold">@u.FullName</td>
+                            <td class="text-muted">@u.Email</td>
+                            <td>
+                                @if (isLocked)
+                                {
+                                    <span class="badge bg-danger">Locked</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <form asp-action="ToggleUserLock" method="post">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <button class="btn btn-sm @(isLocked ? "btn-success" : "btn-danger") lock-btn">
+                                        @(isLocked ? "Unlock" : "Lock")
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- WORKERS TAB -->
+<div id="workers" class="tab-content" style="display:none">
+    <h4 class="section-title mb-3">🛠 Worker Management</h4>
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Profession</th>
+                        <th>City</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var w in allWorkers)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@w.FullName</td>
+                            <td>@w.Profession</td>
+                            <td>@w.City</td>
+                            <td class="text-muted">@w.User?.Email</td>
+                            <td>
+                                @if (w.IsVerified)
+                                {
+                                    <span class="badge bg-success">Verified</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (!w.IsVerified)
+                                {
+                                    <form asp-action="VerifyWorker" method="post">
+                                        <input type="hidden" name="id" value="@w.WorkerProfileId" />
+                                        <button class="btn btn-success verify-btn">Verify</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                contents.forEach(c => c.style.display = 'none');
+                document.getElementById(tab.dataset.tab).style.display = 'block';
+            });
+        });
+    </script>
+}

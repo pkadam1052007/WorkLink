@@ -1,0 +1,190 @@
+﻿@page
+@model WorkLink.Areas.Identity.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        min-height: 100vh;
+        background: linear-gradient(180deg, #eef2ff 0%, #f8f9ff 60%, #ffffff 100%);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        padding: 30px 26px;
+    }
+
+    .logo {
+        text-align: center;
+        margin-bottom: 16px;
+        font-size: 26px;
+        font-weight: 700;
+        color: #2c5be3;
+    }
+
+    .welcome-text {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+        .welcome-text h4 {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .welcome-text p {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+    .role-toggle {
+        display: flex;
+        background: #f1f1f1;
+        border-radius: 50px;
+        padding: 4px;
+        margin-bottom: 20px;
+    }
+
+        .role-toggle button {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #6c757d;
+            cursor: pointer;
+        }
+
+        .role-toggle .active {
+            background: #6f6af8;
+            color: #fff;
+        }
+
+    .form-control {
+        border-radius: 14px;
+        height: 52px;
+        padding-left: 16px;
+    }
+
+    .register-btn {
+        background: #6f6af8;
+        border: none;
+        border-radius: 30px;
+        height: 52px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+        .register-btn:hover {
+            background: #5b56e8;
+        }
+
+    .login-text {
+        text-align: center;
+        font-size: 14px;
+        margin-top: 24px;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <div class="logo">WorkLink</div>
+
+        <div class="welcome-text">
+            <h4>Create Account</h4>
+            <p>Choose your role and sign up</p>
+        </div>
+
+        <!-- ROLE TOGGLE -->
+        <div class="role-toggle">
+            <button type="button" id="userBtn" class="active">I'm a User</button>
+            <button type="button" id="workerBtn">I'm a Worker</button>
+        </div>
+
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+            <!-- ROLE -->
+            <input type="hidden" asp-for="Input.Role" id="Role" value="User" />
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.FullName" class="form-control" placeholder="Full Name" />
+                <label asp-for="Input.FullName">Full Name</label>
+                <span asp-validation-for="Input.FullName" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Address" class="form-control" placeholder="Address" />
+                <label asp-for="Input.Address">Address</label>
+                <span asp-validation-for="Input.Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" placeholder="Email" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" type="password" class="form-control" placeholder="Password" />
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" type="password" class="form-control" placeholder="Confirm Password" />
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn register-btn w-100">
+                Register
+            </button>
+        </form>
+
+        <div class="login-text">
+            Already have an account?
+            <a asp-page="./Login">Login</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const userBtn = document.getElementById("userBtn");
+        const workerBtn = document.getElementById("workerBtn");
+        const roleInput = document.getElementById("Role");
+
+        userBtn.onclick = () => {
+            userBtn.classList.add("active");
+            workerBtn.classList.remove("active");
+            roleInput.value = "User";
+        };
+
+        workerBtn.onclick = () => {
+            workerBtn.classList.add("active");
+            userBtn.classList.remove("active");
+            roleInput.value = "Worker";
+        };
+    </script>
+}

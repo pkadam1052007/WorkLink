@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Contact";
+
+    // Define random quotes
+    var quotes = new List<string> {
+        "Fun fact: All cookies belong to WorkLink 🍪",
+    "Powered by coffee, bugs, and last-minute fixes ☕🐞",
+    "Built with ❤️ and a questionable sleep schedule",
+    "If it works, don’t touch it.",
+    "404: Motivation not found",
+    "Yes, this was tested in production 😎",
+    "Turning ideas into features… eventually",
+    "WorkLink: Connecting people, breaking builds",
+    "One more feature won’t hurt (it will)",
+    "Dear user, it’s not a bug — it’s a feature ✨",
+    "Code so clean even the compiler smiles",
+    "Deploy first. Panic later.",
+    "Made by Prabhav. Debugged by destiny."
+    };
+
+    // Pick a random one
+    var random = new Random();
+    var quote = quotes[random.Next(quotes.Count)];
+}
+
+<section class="container py-5 flex-grow-1">
+    <h2 class="fw-bold mb-3">Contact Us</h2>
+
+    <p class="text-muted">
+        Have questions or need support? Reach out to us.
+    </p>
+
+    <ul class="list-unstyled">
+        <li><strong>Email:</strong> worklinkhelp@gmail.com</li>
+        <li><strong>Phone:</strong> +91 84465 14361</li>
+    </ul>
+</section>
+
+<section class="mt-4">
+    <p class="text-center text-muted small">@quote</p>
+</section>
